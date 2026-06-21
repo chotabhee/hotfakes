@@ -1,0 +1,7 @@
+# VideoHub robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin/
+
+Sitemap: https://yourwebsite.com/sitemap.xml
