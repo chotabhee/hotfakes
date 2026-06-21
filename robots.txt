@@ -1,7 +1,6 @@
-# VideoHub robots.txt
 User-agent: *
 Allow: /
 Disallow: /admin.html
-Disallow: /admin/
+Disallow: /vivaan-panel.html
 
-Sitemap: https://yourwebsite.com/sitemap.xml
+Sitemap: https://enchanting-naiad-11fdf3.netlify.app/sitemap.xml
