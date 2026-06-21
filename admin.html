@@ -67,11 +67,11 @@
 
 <div id="loginScreen">
   <div class="login-box">
-    <div class="login-brand"><div class="play-ico">▶</div><h1>VideoHub</h1><p>Admin Panel</p></div>
+    <div class="login-brand"><div class="play-ico">▶</div><h1>VideoHub</h1><p>Secure Admin Panel</p></div>
     <div class="alert alert-err" id="loginErr">❌ Galat password!</div>
     <div class="fg">
       <label>Password</label>
-      <input class="inp" type="password" id="passInput" placeholder="admin@123" onkeydown="if(event.key==='Enter') document.getElementById('loginBtn').click()">
+      <input class="inp" type="password" id="passInput" placeholder="Password dalein" onkeydown="if(event.key==='Enter') document.getElementById('loginBtn').click()">
     </div>
     <button id="loginBtn" class="btn btn-red btn-full">🔑 Login</button>
     <div style="text-align:center;margin-top:1.25rem;"><a href="index.html" style="color:var(--muted);font-size:.85rem;text-decoration:none;">← Main website par jaein</a></div>
@@ -160,7 +160,8 @@
 
   const PWD_KEY = 'vh_pwd';
   const SES_KEY = 'vh_ses';
-  function getPwd() { return localStorage.getItem(PWD_KEY) || 'admin@123'; }
+  // YAHAN AAPKA NAYA PASSWORD SET HAI 👇
+  function getPwd() { return localStorage.getItem(PWD_KEY) || 'vivaan2012004'; }
 
   document.getElementById('loginBtn').addEventListener('click', () => {
     if(document.getElementById('passInput').value === getPwd()) {
@@ -246,7 +247,6 @@
     document.getElementById('emptyList').style.display='none'; 
     document.getElementById('vlist').style.display='flex';
     
-    // Completely mobile copy-paste proof logic
     let htmlCode = '';
     filtered.forEach(v => {
       htmlCode += '<div class="vrow">';
