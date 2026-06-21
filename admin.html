@@ -149,6 +149,170 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTfvrtZuHXk3RW91Dcwpbghhq--D6X2s8",
+    authDomain: "inshelp-f2cba.firebaseapp.com",
+    databaseURL: "https://inshelp-f2cba-default-rtdb.firebaseio.com",
+    projectId: "inshelp-f2cba",
+    storageBucket: "inshelp-f2cba.firebasestorage.app",
+    messagingSenderId: "714649006925",
+    appId: "1:714649006925:web:8d830ec69f0aa24054bd04",
+    measurementId: "G-QPWBXT6E0G"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  let allVideos = [];
+
+  const PWD_KEY = 'vh_pwd';
+  const SES_KEY = 'vh_ses';
+  function getPwd() { return localStorage.getItem(PWD_KEY) || 'admin@123'; }
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    if(document.getElementById('passInput').value === getPwd()) {
+      sessionStorage.setItem(SES_KEY, '1');
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminDash').style.display = 'block';
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+      setTimeout(()=>document.getElementById('loginErr').style.display='none',3000);
+    }
+  });
+
+  if(sessionStorage.getItem(SES_KEY) === '1') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem(SES_KEY); location.reload();
+  });
+
+  document.querySelectorAll('.slink[data-page]').forEach(link => {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.slink').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(this.dataset.page).classList.add('active');
+      if(this.dataset.page === 'managePage') renderList();
+    });
+  });
+
+  document.getElementById('vimage').addEventListener('input', function() {
+    const img = document.getElementById('prevImg');
+    const ph = document.getElementById('prevPh');
+    if (this.value) { img.src = this.value; img.style.display='block'; ph.style.display='none'; }
+    else { img.style.display='none'; ph.style.display='block'; }
+  });
+
+  function flash(id) {
+    const el = document.getElementById(id); el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+  }
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    const title = document.getElementById('vtitle').value.trim();
+    const image = document.getElementById('vimage').value.trim();
+    const link = document.getElementById('vlink').value.trim();
+
+    if(!title || !image || !link) {
+      document.getElementById('addErr').textContent = '❌ Sabhi fields bharna zaroori hai!';
+      flash('addErr'); return;
+    }
+
+    const vidId = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    set(ref(db, 'videos/' + vidId), { title, imageUrl: image, videoUrl: link, addedDate: new Date().toISOString() })
+    .then(() => {
+      document.getElementById('vtitle').value = ''; document.getElementById('vimage').value = ''; document.getElementById('vlink').value = '';
+      document.getElementById('vimage').dispatchEvent(new Event('input'));
+      flash('addOk');
+    }).catch(e => {
+      document.getElementById('addErr').textContent = 'Error: ' + e.message; flash('addErr');
+    });
+  });
+
+  onValue(ref(db, 'videos'), (snapshot) => {
+    const data = snapshot.val(); allVideos = [];
+    if(data) {
+      Object.keys(data).forEach(key => allVideos.push({ id: key, ...data[key] }));
+      allVideos.sort((a,b) => new Date(b.addedDate) - new Date(a.addedDate));
+    }
+    if(document.getElementById('managePage').classList.contains('active')) renderList();
+  });
+
+  function renderList() {
+    const term = document.getElementById('manageSearch').value.toLowerCase();
+    const filtered = term ? allVideos.filter(v => v.title.toLowerCase().includes(term)) : allVideos;
+    document.getElementById('manageCount').textContent = filtered.length + ' videos';
+    
+    if(filtered.length === 0) {
+      document.getElementById('vlist').style.display='none'; document.getElementById('emptyList').style.display='block'; return;
+    }
+    document.getElementById('emptyList').style.display='none'; document.getElementById('vlist').style.display='flex';
+    
+    document.getElementById('vlist').innerHTML = filtered.map(v => `
+      <div class="vrow">
+        <img class="vrow-thumb" src="${v.imageUrl}">
+        <div class="vrow-info"><h4>${v.title}</h4><a href="${v.videoUrl}" target="_blank">${v.videoUrl}</a></div>
+        <button class="icon-btn del-btn" data-id="${v.id}" style="color:var(--red);">🗑️</button>
+      </div>
+    `).join('');
+
+    document.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if(confirm("Delete karna chahte hain?")) remove(ref(db, 'videos/' + this.dataset.id));
+      });
+    });
+  }
+
+  document.getElementById('manageSearch').addEventListener('input', renderList);
+
+  document.getElementById('wipeBtn').addEventListener('click', () => {
+    if(confirm("Danger: Sare videos Firebase se udd jayenge. Confirm?")) {
+      remove(ref(db, 'videos')).then(() => alert("Sare videos delete ho gaye."));
+    }
+  });
+</script>
+</body>
+</html>
+        </div>
+        <div class="card-panel">
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;font-weight:600;">IMAGE PREVIEW</p>
+          <div class="preview-box" id="prevBox">
+            <img id="prevImg" alt="preview">
+            <div id="prevPh" style="text-align:center; padding:1rem;"><span style="font-size:3rem; display:block;">🖼️</span>URL dalein</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="managePage">
+      <div class="page-head"><h2>Videos Manage Karein</h2></div>
+      <div class="toolbar">
+        <div class="toolbar-left"><span id="manageCount" style="color:var(--muted);font-size:.9rem;">0 videos</span></div>
+        <input class="search-inline" type="text" id="manageSearch" placeholder="🔍 Search...">
+      </div>
+      <div class="vlist" id="vlist"></div>
+      <div class="empty-list" id="emptyList" style="display:none;"><div style="font-size:3.5rem;">🎬</div>Koi video nahi hai.</div>
+    </div>
+
+    <div class="page" id="settingsPage">
+      <div class="page-head"><h2>Settings</h2></div>
+      <div class="settings-grid">
+        <div class="set-card danger-zone">
+          <h3 style="color:var(--red);">⚠️ Danger Zone</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem;">Firebase cloud se saare videos permanently delete ho jayenge.</p>
+          <button class="btn btn-danger" id="wipeBtn">🗑️ Delete All Videos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
   // TODO: APNA FIREBASE CONFIG YAHAN DALEIN 👇
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
