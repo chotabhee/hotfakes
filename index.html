@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VideoHub – Best Video Collection Online</title>
     <meta name="description" content="Watch the best videos online. Click on any image to play the video instantly. Fresh videos added daily.">
-    <meta name="keywords" content="video gallery, watch videos online, best videos, video collection, entertainment videos">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://yourwebsite.com/">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23E63946'/><polygon points='40,30 75,50 40,70' fill='white'/></svg>">
-
     <style>
       :root { --bg: #07070F; --surf: #0F0F1C; --surf2: #181828; --red: #E63946; --red-glow: rgba(230,57,70,0.25); --text: #F0F0FF; --muted: #6E6E98; --border: rgba(255,255,255,0.07); --radius: 14px; --font: 'Poppins', sans-serif; --ease: 0.28s cubic-bezier(.4,0,.2,1); }
       *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -89,7 +85,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-  // Aapka Firebase Config yahan already added hai
   const firebaseConfig = {
     apiKey: "AIzaSyCTfvrtZuHXk3RW91Dcwpbghhq--D6X2s8",
     authDomain: "inshelp-f2cba.firebaseapp.com",
@@ -113,7 +108,6 @@
 
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('hi-IN', { day:'numeric', month:'short', year:'numeric' }); }
-  const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23181828' width='640' height='360'/%3E%3Ctext x='50%25' y='52%25' fill='%236E6E98' text-anchor='middle' dominant-baseline='middle' font-size='80' font-family='sans-serif'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
 
   onValue(ref(db, 'videos'), (snapshot) => {
     loading.style.display = 'none';
@@ -138,105 +132,25 @@
       gallery.innerHTML = ''; gallery.style.display = 'none'; empty.style.display = 'block';
       return;
     }
-    empty.style.display = 'none'; gallery.style.display = 'grid';
-    gallery.innerHTML = list.map(v => `
-      <a class="card" href="${esc(v.videoUrl)}" target="_blank" rel="noopener noreferrer" title="${esc(v.title)}">
-        <div class="card-thumb">
-          <img src="${esc(v.imageUrl)}" alt="${esc(v.title)}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'">
-          <div class="play-overlay"><div class="play-circle"><div class="play-triangle"></div></div></div>
-        </div>
-        <div class="card-body">
-          <div class="card-title">${esc(v.title)}</div>
-          <div class="card-meta">${fmtDate(v.addedDate)}</div>
-        </div>
-      </a>`).join('');
-  }
-
-  searchInput.addEventListener('input', function() { renderGallery(this.value); });
-  const urlQ = new URLSearchParams(location.search).get('q');
-  if (urlQ) { searchInput.value = urlQ; }
-</script>
-</body>
-</html>
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" class="search-input" placeholder="Video search karein...">
-  </div>
-</section>
-
-<main class="main">
-  <div class="row-head"><h2>Latest Videos</h2><span class="count-badge" id="countBadge">Loading...</span></div>
-  <div id="loading" class="loader"></div>
-  <div class="gallery" id="gallery" style="display: none;"></div>
-  <div class="empty" id="emptyState" style="display:none;"><span class="empty-emoji">🎬</span><h3 id="emptyTitle">Koi Video Nahi Mila</h3><p id="emptyMsg">Wait karein ya search badlein.</p></div>
-</main>
-
-<footer><p>© 2026 VideoHub · Sabse achhe videos ek jagah · <a href="admin.html">Admin</a></p></footer>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
-  // Aapka Firebase Config yahan already added hai
-  const firebaseConfig = {
-    apiKey: "AIzaSyCTfvrtZuHXk3RW91Dcwpbghhq--D6X2s8",
-    authDomain: "inshelp-f2cba.firebaseapp.com",
-    databaseURL: "https://inshelp-f2cba-default-rtdb.firebaseio.com",
-    projectId: "inshelp-f2cba",
-    storageBucket: "inshelp-f2cba.firebasestorage.app",
-    messagingSenderId: "714649006925",
-    appId: "1:714649006925:web:8d830ec69f0aa24054bd04",
-    measurementId: "G-QPWBXT6E0G"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  let allVideos = [];
-
-  const gallery = document.getElementById('gallery');
-  const empty = document.getElementById('emptyState');
-  const badge = document.getElementById('countBadge');
-  const loading = document.getElementById('loading');
-  const searchInput = document.getElementById('searchInput');
-
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('hi-IN', { day:'numeric', month:'short', year:'numeric' }); }
-  const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23181828' width='640' height='360'/%3E%3Ctext x='50%25' y='52%25' fill='%236E6E98' text-anchor='middle' dominant-baseline='middle' font-size='80' font-family='sans-serif'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
-
-  onValue(ref(db, 'videos'), (snapshot) => {
-    loading.style.display = 'none';
-    const data = snapshot.val();
-    allVideos = [];
-    if (data) {
-      Object.keys(data).forEach(key => { allVideos.push({ id: key, ...data[key] }); });
-      allVideos.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
-    }
-    renderGallery(searchInput.value);
-  });
-
-  function renderGallery(term) {
-    let list = [...allVideos];
-    if (term && term.trim()) {
-      const t = term.trim().toLowerCase();
-      list = list.filter(v => v.title.toLowerCase().includes(t));
-    }
-    badge.textContent = list.length + ' video' + (list.length !== 1 ? 's' : '');
-
-    if (list.length === 0) {
-      gallery.innerHTML = ''; gallery.style.display = 'none'; empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none'; gallery.style.display = 'grid';
-    gallery.innerHTML = list.map(v => `
-      <a class="card" href="${esc(v.videoUrl)}" target="_blank" rel="noopener noreferrer" title="${esc(v.title)}">
-        <div class="card-thumb">
-          <img src="${esc(v.imageUrl)}" alt="${esc(v.title)}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'">
-          <div class="play-overlay"><div class="play-circle"><div class="play-triangle"></div></div></div>
-        </div>
-        <div class="card-body">
-          <div class="card-title">${esc(v.title)}</div>
-          <div class="card-meta">${fmtDate(v.addedDate)}</div>
-        </div>
-      </a>`).join('');
+    
+    empty.style.display = 'none'; 
+    gallery.style.display = 'grid';
+    
+    // Completely mobile copy-paste proof logic
+    let htmlCode = '';
+    list.forEach(v => {
+      htmlCode += '<a class="card" href="' + esc(v.videoUrl) + '" target="_blank" rel="noopener noreferrer" title="' + esc(v.title) + '">';
+      htmlCode += '<div class="card-thumb">';
+      htmlCode += '<img src="' + esc(v.imageUrl) + '" loading="lazy" onerror="this.style.display=\\'none\\'">';
+      htmlCode += '<div class="play-overlay"><div class="play-circle"><div class="play-triangle"></div></div></div>';
+      htmlCode += '</div>';
+      htmlCode += '<div class="card-body">';
+      htmlCode += '<div class="card-title">' + esc(v.title) + '</div>';
+      htmlCode += '<div class="card-meta">' + fmtDate(v.addedDate) + '</div>';
+      htmlCode += '</div></a>';
+    });
+    
+    gallery.innerHTML = htmlCode;
   }
 
   searchInput.addEventListener('input', function() { renderGallery(this.value); });
