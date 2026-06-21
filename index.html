@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoHub – Best Video Collection Online</title>
+    <meta name="description" content="Watch the best videos online. Click on any image to play the video instantly. Fresh videos added daily.">
+    <meta name="keywords" content="video gallery, watch videos online, best videos, video collection, entertainment videos">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourwebsite.com/"> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23E63946'/><polygon points='40,30 75,50 40,70' fill='white'/></svg>">
+
+    <style>
+      :root { --bg: #07070F; --surf: #0F0F1C; --surf2: #181828; --red: #E63946; --red-glow: rgba(230,57,70,0.25); --text: #F0F0FF; --muted: #6E6E98; --border: rgba(255,255,255,0.07); --radius: 14px; --font: 'Poppins', sans-serif; --ease: 0.28s cubic-bezier(.4,0,.2,1); }
+      *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+      header { position: sticky; top: 0; z-index: 100; background: rgba(7,7,15,0.88); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: .9rem 2rem; }
+      nav { max-width:1400px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+      .logo { font-size:1.4rem; font-weight:800; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:.4rem; letter-spacing:-1px; }
+      .logo-dot { color:var(--red); }
+      .hero { text-align:center; padding: 5rem 1.5rem 3.5rem; background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--red-glow) 0%, transparent 60%); }
+      .hero h1 { font-size: clamp(2rem, 6vw, 3.8rem); font-weight:800; letter-spacing:-2px; line-height:1.1; margin-bottom:.8rem; }
+      .hero h1 em { color:var(--red); font-style:normal; }
+      .hero p { color:var(--muted); font-size:1.05rem; margin-bottom:2rem; }
+      .search-wrap { max-width:480px; margin:0 auto; position:relative; }
+      .search-input { width:100%; padding:.85rem 1.4rem .85rem 3rem; background:var(--surf); border:1.5px solid var(--border); border-radius:50px; color:var(--text); font-family:var(--font); font-size:.95rem; outline:none; transition: border-color var(--ease), box-shadow var(--ease); }
+      .search-input:focus { border-color:var(--red); box-shadow:0 0 0 3px var(--red-glow); }
+      .search-input::placeholder { color:var(--muted); }
+      .search-icon { position:absolute; left:1.1rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:1rem; pointer-events:none; }
+      .main { max-width:1400px; margin:0 auto; padding:2rem; }
+      .row-head { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; border-left:3px solid var(--red); padding-left:.9rem; }
+      .row-head h2 { font-size:1.25rem; font-weight:600; }
+      .count-badge { background:var(--surf2); color:var(--muted); font-size:.8rem; padding:.2rem .7rem; border-radius:50px; border:1px solid var(--border); }
+      .gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap:1.25rem; }
+      .card { display:block; text-decoration:none; color:var(--text); background:var(--surf); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease); }
+      .card:hover { transform:translateY(-7px); box-shadow: 0 20px 50px rgba(0,0,0,.6), 0 0 0 1px rgba(230,57,70,.25); border-color:rgba(230,57,70,.3); }
+      .card-thumb { position:relative; aspect-ratio:16/9; background:var(--surf2); overflow:hidden; }
+      .card-thumb img { width:100%; height:100%; object-fit:cover; transition: transform .5s ease; }
+      .card:hover .card-thumb img { transform:scale(1.06); }
+      .play-overlay { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.7) 0%, rgba(0,0,0,.2) 60%, transparent 100%); display:flex; align-items:center; justify-content:center; opacity:0; transition: opacity var(--ease); }
+      .card:hover .play-overlay { opacity:1; }
+      .play-circle { width:62px; height:62px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px rgba(230,57,70,.6); transform:scale(.8); transition:transform var(--ease); }
+      .card:hover .play-circle { transform:scale(1); }
+      .play-triangle { width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:20px solid #fff; margin-left:5px; }
+      .card-body { padding:.85rem 1rem 1rem; }
+      .card-title { font-size:.93rem; font-weight:500; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+      .card-meta { font-size:.76rem; color:var(--muted); margin-top:.3rem; }
+      .empty { grid-column:1/-1; text-align:center; padding:5rem 1rem; }
+      .empty-emoji { font-size:5rem; display:block; margin-bottom:1rem; }
+      .empty h3 { font-size:1.5rem; margin-bottom:.5rem; }
+      .empty p { color:var(--muted); }
+      footer { text-align:center; padding:2rem 1rem; color:var(--muted); font-size:.85rem; border-top:1px solid var(--border); margin-top:4rem; }
+      footer a { color:var(--muted); }
+      .loader { border: 4px solid var(--surf2); border-top: 4px solid var(--red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 2rem auto; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      @media (max-width:768px) { header { padding:.75rem 1rem; } .hero { padding:3.5rem 1rem 2.5rem; } .main { padding:1rem; } .gallery { grid-template-columns:repeat(2, 1fr); gap:.75rem; } .play-circle { width:44px; height:44px; } .play-triangle { border-left-width:14px; border-top-width:9px; border-bottom-width:9px; } }
+      @media (max-width:400px) { .gallery { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+  <nav><a href="index.html" class="logo"><span class="logo-dot">▶</span> VideoHub</a></nav>
+</header>
+
+<section class="hero">
+  <h1>Amazing Videos<br><em>Collection</em></h1>
+  <p>Image par click karein — video turant chalega ▶</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" class="search-input" placeholder="Video search karein...">
+  </div>
+</section>
+
+<main class="main">
+  <div class="row-head"><h2>Latest Videos</h2><span class="count-badge" id="countBadge">Loading...</span></div>
+  <div id="loading" class="loader"></div>
+  <div class="gallery" id="gallery" style="display: none;"></div>
+  <div class="empty" id="emptyState" style="display:none;"><span class="empty-emoji">🎬</span><h3 id="emptyTitle">Koi Video Nahi Mila</h3><p id="emptyMsg">Wait karein ya search badlein.</p></div>
+</main>
+
+<footer><p>© 2026 VideoHub · Sabse achhe videos ek jagah · <a href="admin.html">Admin</a></p></footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+  // TODO: APNA FIREBASE CONFIG YAHAN DALEIN 👇
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  let allVideos = [];
+
+  const gallery = document.getElementById('gallery');
+  const empty = document.getElementById('emptyState');
+  const badge = document.getElementById('countBadge');
+  const loading = document.getElementById('loading');
+  const searchInput = document.getElementById('searchInput');
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('hi-IN', { day:'numeric', month:'short', year:'numeric' }); }
+  const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23181828' width='640' height='360'/%3E%3Ctext x='50%25' y='52%25' fill='%236E6E98' text-anchor='middle' dominant-baseline='middle' font-size='80' font-family='sans-serif'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
+
+  onValue(ref(db, 'videos'), (snapshot) => {
+    loading.style.display = 'none';
+    const data = snapshot.val();
+    allVideos = [];
+    if (data) {
+      Object.keys(data).forEach(key => { allVideos.push({ id: key, ...data[key] }); });
+      allVideos.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
+    }
+    renderGallery(searchInput.value);
+  });
+
+  function renderGallery(term) {
+    let list = [...allVideos];
+    if (term && term.trim()) {
+      const t = term.trim().toLowerCase();
+      list = list.filter(v => v.title.toLowerCase().includes(t));
+    }
+    badge.textContent = list.length + ' video' + (list.length !== 1 ? 's' : '');
+
+    if (list.length === 0) {
+      gallery.innerHTML = ''; gallery.style.display = 'none'; empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none'; gallery.style.display = 'grid';
+    gallery.innerHTML = list.map(v => `
+      <a class="card" href="${esc(v.videoUrl)}" target="_blank" rel="noopener noreferrer" title="${esc(v.title)}">
+        <div class="card-thumb">
+          <img src="${esc(v.imageUrl)}" alt="${esc(v.title)}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'">
+          <div class="play-overlay"><div class="play-circle"><div class="play-triangle"></div></div></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${esc(v.title)}</div>
+          <div class="card-meta">${fmtDate(v.addedDate)}</div>
+        </div>
+      </a>`).join('');
+  }
+
+  searchInput.addEventListener('input', function() { renderGallery(this.value); });
+  const urlQ = new URLSearchParams(location.search).get('q');
+  if (urlQ) { searchInput.value = urlQ; }
+</script>
+</body>
+</html>
