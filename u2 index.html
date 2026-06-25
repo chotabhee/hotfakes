@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HotFake – Best Video Collection</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      :root { --bg: #07070F; --surf: #0F0F1C; --surf2: #181828; --red: #E63946; --red-glow: rgba(230,57,70,0.25); --text: #F0F0FF; --muted: #6E6E98; --border: rgba(255,255,255,0.07); --radius: 14px; --font: 'Poppins', sans-serif; --ease: 0.28s cubic-bezier(.4,0,.2,1); }
+      *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+      
+      body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; touch-action: manipulation; }
+      
+      header { position: sticky; top: 0; z-index: 100; background: rgba(7,7,15,0.88); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: .9rem 2rem; }
+      nav { max-width:1400px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+      .logo { font-size:1.6rem; font-weight:800; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:.4rem; letter-spacing:-1px; }
+      .logo-dot { color:var(--red); }
+      
+      .hero { text-align:center; padding: 5rem 1.5rem 3.5rem; background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--red-glow) 0%, transparent 60%); }
+      .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight:800; letter-spacing:-2px; line-height:1.1; margin-bottom:.8rem; }
+      .hero h1 em { color:var(--red); font-style:normal; }
+      .hero p { color:var(--muted); font-size:1.05rem; margin-bottom:2rem; }
+      
+      .search-wrap { max-width:480px; margin:0 auto; position:relative; }
+      .search-input { width:100%; padding:.85rem 1.4rem .85rem 3rem; background:var(--surf); border:1.5px solid var(--border); border-radius:50px; color:var(--text); font-family:var(--font); font-size:.95rem; outline:none; transition: border-color var(--ease), box-shadow var(--ease); }
+      .search-input:focus { border-color:var(--red); box-shadow:0 0 0 3px var(--red-glow); }
+      .search-icon { position:absolute; left:1.1rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:1rem; pointer-events:none; }
+      
+      .main { max-width:1400px; margin:0 auto; padding:2rem; }
+      .row-head { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; border-left:3px solid var(--red); padding-left:.9rem; }
+      .row-head h2 { font-size:1.25rem; font-weight:600; }
+      .count-badge { background:var(--surf2); color:var(--muted); font-size:.8rem; padding:.2rem .7rem; border-radius:50px; border:1px solid var(--border); }
+      
+      .gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap:1.25rem; }
+      .card { display:block; text-decoration:none; color:var(--text); background:var(--surf); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease); cursor: pointer;}
+      .card:hover { transform:translateY(-7px); box-shadow: 0 20px 50px rgba(0,0,0,.6), 0 0 0 1px rgba(230,57,70,.25); border-color:rgba(230,57,70,.3); }
+      .card-thumb { position:relative; aspect-ratio:16/9; background:var(--surf2); overflow:hidden; }
+      .card-thumb img { width:100%; height:100%; object-fit:cover; transition: transform .5s ease; }
+      .card:hover .card-thumb img { transform:scale(1.06); }
+      .cat-badge { position:absolute; top:10px; left:10px; font-size:.7rem; font-weight:600; padding:.3rem .6rem; border-radius:5px; z-index:2; text-transform:uppercase;}
+      .cat-badge.movie { background: var(--red); color:#fff; box-shadow:0 2px 10px rgba(230,57,70,.5); }
+      .cat-badge.link { background: rgba(0,0,0,0.6); color:#fff; backdrop-filter:blur(5px); }
+      
+      .play-overlay { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.7) 0%, rgba(0,0,0,.2) 60%, transparent 100%); display:flex; align-items:center; justify-content:center; opacity:0; transition: opacity var(--ease); z-index:1;}
+      .card:hover .play-overlay { opacity:1; }
+      .play-circle { width:62px; height:62px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px rgba(230,57,70,.6); transform:scale(.8); transition:transform var(--ease); }
+      .card:hover .play-circle { transform:scale(1); }
+      .play-triangle { width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:20px solid #fff; margin-left:5px; }
+      .card-body { padding:.85rem 1rem 1rem; }
+      .card-title { font-size:.95rem; font-weight:500; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+      .card-meta { font-size:.76rem; color:var(--muted); margin-top:.4rem; }
+      
+      /* --- HOTFAKE SECURE PLAYER --- */
+      #playerModal { display:none; position:fixed; inset:0; background:#000; z-index:9999; flex-direction:column; touch-action: none !important; }
+      .player-wrapper { flex:1; display:flex; justify-content:center; align-items:center; width:100vw; height:100vh; position:relative; background: #000; overflow: hidden; touch-action: none !important;}
+      
+      #html5Player { width:100%; height:100%; max-height:100vh; outline:none; display:none; object-fit: contain; cursor: pointer; }
+      
+      #iframeContainer { width: 100%; height: 100%; position: relative; display: none; overflow: hidden; background: #000; touch-action: none !important; }
+      
+      #iframePlayer { width: 100%; height: 100%; border: none; position: relative; z-index: 1; transform: scale(1.15); }
+
+      /* 🔥 THE ULTIMATE SHIELD (Absorbs double clicks) */
+      #touchCatcher {
+          position: absolute; inset: 0; z-index: 50;
+          background: transparent; 
+          pointer-events: auto; /* Active by default to catch 0.0001s touch */
+      }
+
+      /* Censor Bars */
+      .censor-top { position: absolute; top: 0; left: 0; right: 0; height: 0px; background: linear-gradient(to bottom, rgba(0,0,0,1) 40%, transparent 100%); z-index: 10; pointer-events: none; }
+      .censor-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 0px; background: linear-gradient(to top, rgba(0,0,0,1) 40%, transparent 100%); z-index: 10; pointer-events: none; }
+
+      /* 🔥 SMART UI OVERLAY */
+      .smart-overlay {
+          position: absolute; inset: 0; z-index: 99;
+          display: flex; flex-direction: column; justify-content: space-between;
+          opacity: 0; visibility: hidden; pointer-events: none; 
+          /* UI off hote waqt 1.2s lagayega */
+          transition: opacity 1.2s ease-in, visibility 1.2s; 
+      }
+      .smart-overlay.active {
+          opacity: 1; visibility: visible;
+          /* 🔥 0.0000s INSTANT ON! Koi delay nahi! */
+          transition: opacity 0s; 
+      }
+
+      .glass-top {
+          background: linear-gradient(to bottom, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 75%, transparent 100%);
+          height: 90px; display: flex; align-items: flex-start; padding: 15px 20px;
+          backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); pointer-events: auto;
+      }
+      .glass-bottom {
+          background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 75%, transparent 100%);
+          height: 90px; display:flex; align-items:center; justify-content:flex-end; padding: 0 30px;
+          backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); pointer-events: auto;
+      }
+      
+      .top-left-group { display: flex; align-items: center; }
+
+      .ui-back-btn {
+          background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+          color: white; width: 40px; height: 40px; border-radius: 50%;
+          font-size: 1.1rem; display: flex; justify-content: center; align-items: center;
+          cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s;
+      }
+      .ui-back-btn:hover { background: var(--red); border-color: var(--red); }
+      .ui-back-btn:focus { outline: none; }
+
+      .overlay-title { color: white; margin-left: 15px; font-weight: 500; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80vw; }
+      .watermark-logo { position: absolute; bottom: 25px; right: 35px; color: rgba(255, 255, 255, 0.45); font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; font-family: 'Arial Black', sans-serif; pointer-events: none; }
+      .empty { grid-column:1/-1; text-align:center; padding:5rem 1rem; }
+      .empty-emoji { font-size:5rem; display:block; margin-bottom:1rem; }
+      
+      footer { text-align:center; padding:3rem 1rem 2rem; border-top:1px solid var(--border); margin-top:4rem; background:var(--surf); }
+      .social-links { display:flex; gap:1rem; justify-content:center; margin-bottom:1.5rem; flex-wrap:wrap; }
+      .soc-btn { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border-radius:50px; background:var(--surf2); color:var(--text); text-decoration:none; font-size:.85rem; font-weight:500; border:1px solid var(--border); transition:all .2s;}
+      .soc-btn:hover { background:var(--red); border-color:var(--red); transform:translateY(-2px); }
+      .footer-txt { color:var(--muted); font-size:.85rem; }
+      
+      .loader { border: 4px solid var(--surf2); border-top: 4px solid var(--red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 2rem auto; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      
+      @media (max-width:768px) { header { padding:.75rem 1rem; } .hero { padding:3.5rem 1rem 2.5rem; } .main { padding:1rem; } .gallery { grid-template-columns:repeat(2, 1fr); gap:.75rem; } }
+      @media (max-width:400px) { .gallery { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+  <nav><a href="index.html" class="logo"><span class="logo-dot">▶</span> HotFake</a></nav>
+</header>
+
+<section class="hero">
+  <h1>Amazing Videos<br><em>Collection</em></h1>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" class="search-input" placeholder="Search movies, videos...">
+  </div>
+</section>
+
+<main class="main">
+  <div class="row-head"><h2>Latest Videos</h2><span class="count-badge" id="countBadge">Loading...</span></div>
+  <div id="loading" class="loader"></div>
+  <div class="gallery" id="gallery" style="display: none;"></div>
+</main>
+
+<div id="playerModal">
+  <div class="player-wrapper" id="playerWrapper">
+
+    <video id="html5Player" playsinline controls></video>
+    
+    <div id="iframeContainer">
+       <div class="censor-top"></div>
+       <div class="censor-bottom"></div>
+
+       <div id="touchCatcher"></div>
+
+       <div class="smart-overlay" id="smartOverlay">
+           <div class="glass-top">
+               <div class="top-left-group">
+                   <button class="ui-back-btn" id="uiBackBtn">⬅</button>
+                   <span class="overlay-title" id="overlayTitle">Movie Title</span>
+               </div>
+           </div>
+           <div class="watermark-logo">HOTFAKE</div>
+       </div>
+       
+       <iframe id="iframePlayer" allowfullscreen allow="autoplay; fullscreen"></iframe>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTfvrtZuHXk3RW91Dcwpbghhq--D6X2s8",
+    authDomain: "inshelp-f2cba.firebaseapp.com",
+    databaseURL: "https://inshelp-f2cba-default-rtdb.firebaseio.com",
+    projectId: "inshelp-f2cba",
+    storageBucket: "inshelp-f2cba.firebasestorage.app",
+    messagingSenderId: "714649006925",
+    appId: "1:714649006925:web:8d830ec69f0aa24054bd04",
+    measurementId: "G-QPWBXT6E0G"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  let allVideos = [];
+
+  const gallery = document.getElementById('gallery');
+  const badge = document.getElementById('countBadge');
+  const loading = document.getElementById('loading');
+  const searchInput = document.getElementById('searchInput');
+
+  // --- 🔥 DYNAMIC FAVICON LOADER THEEK JAGAH PAR HAI ---
+  onValue(ref(db, 'settings/general/favicon'), (snap) => {
+    const faviconUrl = snap.val();
+    if(faviconUrl) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+      }
+      link.href = faviconUrl;
+    }
+  });
+
+  function esc(s) { return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
+  onValue(ref(db, 'videos'), (snapshot) => {
+    loading.style.display = 'none';
+    const data = snapshot.val();
+    allVideos = [];
+    if (data) {
+      Object.keys(data).forEach(key => { allVideos.push({ id: key, ...data[key] }); });
+      allVideos.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
+    }
+    renderGallery(searchInput.value);
+  });
+
+  function renderGallery(term) {
+    let list = [...allVideos];
+    if (term && term.trim()) {
+      const t = term.trim().toLowerCase();
+      list = list.filter(v => v.title.toLowerCase().includes(t));
+    }
+    badge.textContent = list.length + ' video' + (list.length !== 1 ? 's' : '');
+
+    gallery.style.display = 'grid';
+    let htmlCode = '';
+    list.forEach(v => {
+      const isEmbed = v.type === 'embed';
+      const hrefLink = isEmbed ? '#' : esc(v.videoUrl);
+      const targetAttr = isEmbed ? '' : 'target="_blank" rel="noopener noreferrer"';
+      const catBadge = isEmbed ? '<span class="cat-badge movie">🎬 Movie Mode</span>' : '<span class="cat-badge link">🔗 Fast Link</span>';
+
+      htmlCode += `
+        <a class="card vid-card" data-url="${esc(v.videoUrl)}" data-title="${esc(v.title)}" data-embed="${isEmbed ? 'true' : 'false'}" href="${hrefLink}" ${targetAttr} title="${esc(v.title)}">
+          <div class="card-thumb">
+            <img src="${esc(v.imageUrl)}" loading="lazy" onerror="this.style.display='none'">
+            ${catBadge}
+            <div class="play-overlay"><div class="play-circle"><div class="play-triangle"></div></div></div>
+          </div>
+        </a>`;
+    });
+    gallery.innerHTML = htmlCode;
+
+    document.querySelectorAll('.vid-card').forEach(card => {
+      card.addEventListener('click', async function(e) {
+        if (this.dataset.embed === 'true') {
+          e.preventDefault(); 
+          player.open(this.dataset.url, this.dataset.title);
+        }
+      });
+    });
+  }
+
+  searchInput.addEventListener('input', function() { renderGallery(this.value); });
+
+  // --- 🚀 SECURE VIDEO PLAYER ---
+  class SecureVideoPlayer {
+    constructor() {
+      this.init();
+      this.uiTimer = null;
+      this.shieldRestoreTimer = null;
+      this.lastTap = 0;
+    }
+
+    init() {
+      this.playerModal = document.getElementById('playerModal');
+      this.iframeContainer = document.getElementById('iframeContainer');
+      this.iframePlayer = document.getElementById('iframePlayer');
+      this.playerWrapper = document.getElementById('playerWrapper');
+      
+      this.touchCatcher = document.getElementById('touchCatcher');
+      this.smartOverlay = document.getElementById('smartOverlay');
+      this.uiBackBtn = document.getElementById('uiBackBtn');
+      this.overlayTitle = document.getElementById('overlayTitle');
+
+      // 🔥 1. FLAWLESS HOME PAGE BACK ROUTING
+      window.addEventListener('hashchange', () => {
+         if (window.location.hash !== '#play' && this.playerModal.style.display === 'flex') {
+             this.close(); 
+         }
+      });
+
+      this.uiBackBtn.addEventListener('click', () => {
+          if (window.location.hash === '#play') {
+              window.history.back();
+          } else {
+              this.close();
+          }
+      });
+
+      // ⚡⚡ 2. THE 0.0001s TOUCH & DOUBLE-CLICK KILLER ⚡⚡
+      this.touchCatcher.addEventListener('touchstart', (e) => {
+          let now = Date.now();
+
+          // A) 0.0001s INSTANT UI SHOW (Transition is 0s)
+          this.smartOverlay.classList.add('active');
+          clearTimeout(this.uiTimer);
+          this.uiTimer = setTimeout(() => {
+              this.smartOverlay.classList.remove('active');
+          }, 3500);
+
+          // B) BRUTAL DOUBLE-CLICK BLOCKER
+          if (now - this.lastTap < 400) {
+              e.preventDefault(); 
+              return; 
+          }
+          this.lastTap = now;
+
+          // C) SINGLE TAP PASS-THROUGH
+          this.touchCatcher.style.pointerEvents = 'none';
+
+          clearTimeout(this.shieldRestoreTimer);
+          this.shieldRestoreTimer = setTimeout(() => {
+              this.touchCatcher.style.pointerEvents = 'auto';
+          }, 150);
+
+      }, {passive: false});
+
+    }
+
+    async open(url, title) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; 
+
+      this.playerModal.style.display = 'flex';
+      this.overlayTitle.innerText = title; 
+      
+      window.location.hash = 'play';
+      
+      if (url.includes('hdhub4u')) {
+        url = url + '&no-ads=true&hide-controls=true';
+      }
+      
+      this.iframeContainer.style.display = 'block';
+      this.iframePlayer.src = url;
+      
+      // Start with UI active
+      this.touchCatcher.style.pointerEvents = 'auto'; 
+      this.smartOverlay.classList.add('active');
+      clearTimeout(this.uiTimer);
+      this.uiTimer = setTimeout(() => {
+          this.smartOverlay.classList.remove('active');
+      }, 3500);
+
+      // Lock to landscape only
+      try {
+        if (this.playerWrapper.requestFullscreen) {
+          await this.playerWrapper.requestFullscreen();
+        } else if (this.playerWrapper.webkitRequestFullscreen) {
+          await this.playerWrapper.webkitRequestFullscreen();
+        }
+        
+        if (screen.orientation && screen.orientation.lock) {
+           await screen.orientation.lock('landscape').catch(e => console.log(e));
+        }
+      } catch (err) {
+        console.log("Auto-Fullscreen error:", err);
+      }
+    }
+
+    close() {
+      this.playerModal.style.display = 'none';
+      
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      
+      this.smartOverlay.classList.remove('active');
+      clearTimeout(this.uiTimer);
+      clearTimeout(this.shieldRestoreTimer);
+      this.touchCatcher.style.pointerEvents = 'auto';
+      
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+         if(document.exitFullscreen) document.exitFullscreen();
+         else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+
+      if (screen.orientation && screen.orientation.unlock) {
+         screen.orientation.unlock();
+      }
+      
+      this.iframePlayer.src = '';
+    }
+  }
+
+  const player = new SecureVideoPlayer();
+
+</script>
+</body>
+</html>
